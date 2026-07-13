@@ -18,10 +18,12 @@ target_sources(
     src/plugin-main.cpp
     src/filter-settings.cpp
     src/gaussian-blur.cpp
+    src/obs-version-policy.cpp
     src/frosted-glass-filter.cpp
     src/frosted-glass-filter.hpp
     src/filter-settings.hpp
     src/gaussian-blur.hpp
+    src/obs-version-policy.hpp
 )
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
 
@@ -35,6 +37,10 @@ if(BUILD_TESTING)
   target_compile_features(shader-contract-test PRIVATE cxx_std_17)
   target_compile_definitions(shader-contract-test PRIVATE EFFECT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/effects")
   add_test(NAME shader-contract COMMAND shader-contract-test)
+  add_executable(obs-version-policy-test tests/obs-version-policy-test.cpp src/obs-version-policy.cpp)
+  target_include_directories(obs-version-policy-test PRIVATE src)
+  target_compile_features(obs-version-policy-test PRIVATE cxx_std_17)
+  add_test(NAME obs-version-policy COMMAND obs-version-policy-test)
   add_executable(shader-runtime-test tests/shader-runtime-test.cpp)
   target_link_libraries(shader-runtime-test PRIVATE OBS::libobs)
   target_compile_features(shader-runtime-test PRIVATE cxx_std_17)
