@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'ObsVersionPolicy.ps1')
 
 $registryRoots = @(
     'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
@@ -23,7 +24,7 @@ $supported = (Test-Path -LiteralPath $exe) -and (Test-Path -LiteralPath $obsDll)
     (Test-Path -LiteralPath $pluginRoot) -and (Test-Path -LiteralPath $dataRoot)
 $obsVersion = if (Test-Path -LiteralPath $obsDll) { (Get-Item -LiteralPath $obsDll).VersionInfo.FileVersion } else { $null }
 $streamlabsVersion = $entry.DisplayVersion
-$versionSupported = ($streamlabsVersion -eq '1.21.4') -or ($streamlabsVersion -eq '1.21.4.0')
+$versionSupported = Test-SupportedObsVersion -Version $obsVersion
 
 [ordered]@{
     installed = [bool](Test-Path -LiteralPath $exe)
@@ -34,11 +35,10 @@ $versionSupported = ($streamlabsVersion -eq '1.21.4') -or ($streamlabsVersion -e
     pluginRoot = $pluginRoot
     dataRoot = $dataRoot
     obsDll = $obsDll
-    supported = [bool]($supported -and $versionSupported -and $obsVersion -eq '31.1.2')
+    supported = [bool]($supported -and $versionSupported)
     reason = if (-not $supported) { 'Required Streamlabs OBS runtime paths were not found.' }
-             elseif (-not $versionSupported) { "This package targets Streamlabs Desktop 1.21.4; detected $streamlabsVersion." }
-             elseif ($obsVersion -ne '31.1.2') { "This package targets OBS 31.1.2; detected $obsVersion." }
+             elseif (-not $versionSupported) { "This package requires OBS Core 31.1.x; detected $obsVersion in Streamlabs Desktop $streamlabsVersion." }
              else { 'Compatible.' }
 } | ConvertTo-Json -Depth 4
 
-if (-not ($supported -and $versionSupported -and $obsVersion -eq '31.1.2')) { exit 2 }
+if (-not ($supported -and $versionSupported)) { exit 2 }

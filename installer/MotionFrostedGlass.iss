@@ -23,7 +23,7 @@ SetupLogging=yes
 CloseApplications=no
 RestartApplications=no
 VersionInfoVersion=0.1.6.0
-VersionInfoDescription=Pure Gaussian Blur filter installer for Streamlabs Desktop 1.21.4
+VersionInfoDescription=Pure Gaussian Blur filter installer for Streamlabs Desktop with OBS Core 31.1.x
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
 
@@ -80,29 +80,39 @@ function InitializeSetup: Boolean;
 var
   StreamlabsVersion: String;
   ObsVersion: String;
+  ObsMajor: Word;
+  ObsMinor: Word;
+  ObsRevision: Word;
+  ObsBuild: Word;
 begin
   Result := False;
   StreamlabsRoot := ExpandConstant('{autopf}\Streamlabs OBS');
 
   if not FileExists(StreamlabsRoot + '\Streamlabs OBS.exe') then
   begin
-    MsgBox('找不到 Streamlabs Desktop。請先安裝 64 位元 Streamlabs Desktop 1.21.4。'#13#10 +
-      'Streamlabs Desktop was not found. Install the 64-bit version 1.21.4 first.', mbError, MB_OK);
+    MsgBox('找不到 Streamlabs Desktop。請先安裝 64 位元 Streamlabs Desktop。'#13#10 +
+      'Streamlabs Desktop was not found. Install the 64-bit version first.', mbError, MB_OK);
     Exit;
   end;
 
-  if not GetVersionNumbersString(StreamlabsRoot + '\Streamlabs OBS.exe', StreamlabsVersion) or
-     (CompareText(StreamlabsVersion, '1.21.4.0') <> 0) then
+  if not GetVersionNumbersString(StreamlabsRoot + '\Streamlabs OBS.exe', StreamlabsVersion) then
+    StreamlabsVersion := 'unknown';
+
+  if not GetVersionNumbersString(GetRuntimeRoot + '\obs.dll', ObsVersion) then
+    ObsVersion := 'unknown';
+
+  if not GetVersionComponents(GetRuntimeRoot + '\obs.dll', ObsMajor, ObsMinor, ObsRevision, ObsBuild) then
   begin
-    MsgBox('此安裝器只支援 Streamlabs Desktop 1.21.4。偵測到版本：' + StreamlabsVersion + #13#10 +
-      'This installer only supports Streamlabs Desktop 1.21.4.', mbError, MB_OK);
+    MsgBox('無法讀取 OBS 核心版本。Streamlabs Desktop：' + StreamlabsVersion + #13#10 +
+      'Unable to read the OBS Core version.', mbError, MB_OK);
     Exit;
   end;
-
-  if not GetVersionNumbersString(GetRuntimeRoot + '\obs.dll', ObsVersion) or
-     (CompareText(ObsVersion, '31.1.2.0') <> 0) then
+  if (ObsMajor <> 31) or (ObsMinor <> 1) then
   begin
-    MsgBox('Streamlabs OBS runtime 不相容。偵測到版本：' + ObsVersion, mbError, MB_OK);
+    MsgBox('此安裝器需要 OBS Core 31.1.x。偵測到 OBS：' + ObsVersion +
+      '；Streamlabs Desktop：' + StreamlabsVersion + #13#10 +
+      'This installer requires OBS Core 31.1.x. Detected OBS: ' + ObsVersion +
+      '; Streamlabs Desktop: ' + StreamlabsVersion, mbError, MB_OK);
     Exit;
   end;
 

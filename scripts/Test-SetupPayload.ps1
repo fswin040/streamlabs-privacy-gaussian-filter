@@ -6,11 +6,17 @@ $expectedHash = '56ABF12B3578C1C46996CE8CCAA44E4E32EF000EB8548C59451AD98BA93FE8C
 
 if (-not (Test-Path -LiteralPath $installerSource)) { throw "Missing installer source: $installerSource" }
 $installerText = Get-Content -LiteralPath $installerSource -Raw
-if ($installerText -notmatch "CompareText\(StreamlabsVersion, '1\.21\.4\.0'\)") {
-    throw 'Installer does not require Streamlabs Desktop 1.21.4.0'
+if ($installerText -match "CompareText\(StreamlabsVersion") {
+    throw 'Installer still gates on an exact Streamlabs Desktop version'
 }
-if ($installerText -match "CompareText\(StreamlabsVersion, '1\.21\.3\.0'\)") {
-    throw 'Installer still accepts stale Streamlabs Desktop 1.21.3.0'
+if ($installerText -match "CompareText\(ObsVersion") {
+    throw 'Installer still gates on an exact OBS patch version'
+}
+if ($installerText -notmatch "GetVersionComponents\(GetRuntimeRoot \+ '\\obs\.dll', ObsMajor, ObsMinor, ObsRevision, ObsBuild\)") {
+    throw 'Installer does not decode numeric obs.dll version components'
+}
+if ($installerText -notmatch "\(ObsMajor <> 31\) or \(ObsMinor <> 1\)") {
+    throw 'Installer does not require OBS Core 31.1.x'
 }
 
 $required = @(
