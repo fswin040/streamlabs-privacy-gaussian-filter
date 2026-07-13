@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $package = Join-Path $root 'outputs\MotionFrostedGlass-0.1.6\plugin'
 $installerSource = Join-Path $root 'installer\MotionFrostedGlass.iss'
-$expectedHash = '56ABF12B3578C1C46996CE8CCAA44E4E32EF000EB8548C59451AD98BA93FE8C7'
+$expectedHash = 'C44DAD94F14932F6D901D60C47542B0859774C1EAC1CF35EDC608FDE51790C20'
 
 if (-not (Test-Path -LiteralPath $installerSource)) { throw "Missing installer source: $installerSource" }
 $installerText = Get-Content -LiteralPath $installerSource -Raw
