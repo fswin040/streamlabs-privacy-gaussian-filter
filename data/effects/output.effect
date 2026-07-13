@@ -1,0 +1,37 @@
+uniform float4x4 ViewProj;
+// obs_source_process_filter_end requires this conventional parameter name.
+uniform texture2d image;
+uniform texture2d output_image;
+
+sampler_state linear_clamp {
+	Filter = Linear;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
+struct VertInOut {
+	float4 pos : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VertInOut VSDefault(VertInOut input)
+{
+	VertInOut output;
+	output.pos = mul(float4(input.pos.xyz, 1.0), ViewProj);
+	output.uv = input.uv;
+	return output;
+}
+
+float4 PSOutput(VertInOut input) : TARGET
+{
+	return output_image.Sample(linear_clamp, input.uv);
+}
+
+technique Draw
+{
+	pass
+	{
+		vertex_shader = VSDefault(input);
+		pixel_shader = PSOutput(input);
+	}
+}

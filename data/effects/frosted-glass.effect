@@ -1,0 +1,45 @@
+uniform float4x4 ViewProj;
+uniform texture2d image;
+uniform texture2d blurred_image;
+uniform float4 uv_rect;
+uniform float4 blur_rect;
+
+sampler_state linear_clamp {
+	Filter = Linear;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
+struct VertInOut {
+	float4 pos : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VertInOut VSDefault(VertInOut input)
+{
+	VertInOut output;
+	output.pos = mul(float4(input.pos.xyz, 1.0), ViewProj);
+	output.uv = input.uv;
+	return output;
+}
+
+float4 PSPureBlur(VertInOut input) : TARGET
+{
+	float4 original = image.Sample(linear_clamp, input.uv);
+	float2 blurred_uv = saturate((input.uv - blur_rect.xy) / blur_rect.zw);
+	float4 blurred = blurred_image.Sample(linear_clamp, blurred_uv);
+	float2 minimum_uv = uv_rect.xy;
+	float2 maximum_uv = uv_rect.xy + uv_rect.zw;
+	float inside = step(minimum_uv.x, input.uv.x) * step(minimum_uv.y, input.uv.y) *
+		step(input.uv.x, maximum_uv.x) * step(input.uv.y, maximum_uv.y);
+	return lerp(original, blurred, inside);
+}
+
+technique Draw
+{
+	pass
+	{
+		vertex_shader = VSDefault(input);
+		pixel_shader = PSPureBlur(input);
+	}
+}
