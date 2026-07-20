@@ -5,6 +5,7 @@
 /outputs/
 /.deps/
 /.superpowers/
+/.worktrees/
 /work/
 /.codex/
 /docs/superpowers/
