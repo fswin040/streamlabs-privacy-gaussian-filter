@@ -36,6 +36,30 @@ int main()
         }
     }
 
+    if (!motion_frosted_obs_runtime_supported(make_version(31, 1, 3), "31.1.2sl19b3")) {
+        std::cerr << "Expected Streamlabs OBS build 31.1.2sl19b3 to be supported\n";
+        return 1;
+    }
+
+    const char *rejected_builds[] = {
+        "31.1.2ndi1",
+        "31.1.2sl19b2",
+        "31.1.2sl22",
+        "31.1.3",
+        "",
+        nullptr,
+    };
+    for (const char *build : rejected_builds) {
+        if (motion_frosted_obs_runtime_supported(make_version(31, 1, 3), build)) {
+            std::cerr << "Expected non-sl19b3 build to be rejected\n";
+            return 1;
+        }
+    }
+    if (motion_frosted_obs_runtime_supported(make_version(31, 2, 0), "31.1.2sl19b3")) {
+        std::cerr << "Expected non-31.1 API with sl19b3 marker to be rejected\n";
+        return 1;
+    }
+
     std::cout << "All OBS version policy tests passed\n";
     return 0;
 }

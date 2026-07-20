@@ -35,7 +35,8 @@
   },
   "name": "motion-frosted-glass",
   "displayName": "Streamlabs Privacy Gaussian Filter",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Streamlabs Privacy Gaussian Filter Contributors",
+  "email": "",
   "website": "https://github.com/fswin040/streamlabs-privacy-gaussian-filter"
 }

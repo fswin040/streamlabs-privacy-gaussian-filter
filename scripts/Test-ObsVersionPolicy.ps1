@@ -17,3 +17,12 @@ foreach ($version in $rejected) {
 }
 
 Write-Output 'All PowerShell OBS version policy tests passed'
+
+if (-not (Test-SupportedObsRuntime -Version '31.1.2' -BuildMarker '31.1.2sl19b3')) {
+    throw 'Expected verified sl19b3 runtime to be supported.'
+}
+foreach ($marker in @('31.1.2ndi1', '31.1.2sl19b2', '31.1.2sl22', '')) {
+    if (Test-SupportedObsRuntime -Version '31.1.2' -BuildMarker $marker) {
+        throw "Expected unverified runtime marker to be rejected: $marker"
+    }
+}

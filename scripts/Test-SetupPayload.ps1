@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$package = Join-Path $root 'outputs\MotionFrostedGlass-0.1.6\plugin'
+$package = Join-Path $root 'outputs\MotionFrostedGlass-0.1.7\plugin'
 $installerSource = Join-Path $root 'installer\MotionFrostedGlass.iss'
-$expectedHash = 'C44DAD94F14932F6D901D60C47542B0859774C1EAC1CF35EDC608FDE51790C20'
+$expectedHash = 'A304D205570F2F148647B813B600B92F8B451D221EC705B64ABC65632153F106'
 
 if (-not (Test-Path -LiteralPath $installerSource)) { throw "Missing installer source: $installerSource" }
 $installerText = Get-Content -LiteralPath $installerSource -Raw
@@ -15,8 +15,9 @@ if ($installerText -match "CompareText\(ObsVersion") {
 if ($installerText -notmatch "GetVersionComponents\(GetRuntimeRoot \+ '\\obs\.dll', ObsMajor, ObsMinor, ObsRevision, ObsBuild\)") {
     throw 'Installer does not decode numeric obs.dll version components'
 }
-if ($installerText -notmatch "\(ObsMajor <> 31\) or \(ObsMinor <> 1\)") {
-    throw 'Installer does not require OBS Core 31.1.x'
+if ($installerText -notmatch "31\.1\.2sl19b3" -or
+    $installerText -notmatch "CompareText\(ObsBuildMarker, '31\.1\.2sl19b3'\)") {
+    throw 'Installer does not fail closed on the verified sl19b3 ABI marker'
 }
 
 $required = @(

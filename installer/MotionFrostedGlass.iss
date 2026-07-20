@@ -1,6 +1,6 @@
 #define AppName "Pure Gaussian Blur for Streamlabs"
-#define AppVersion "0.1.6"
-#define Payload "..\outputs\MotionFrostedGlass-0.1.6\plugin"
+#define AppVersion "0.1.7"
+#define Payload "..\outputs\MotionFrostedGlass-0.1.7\plugin"
 
 [Setup]
 AppId={{A8BD55D5-878B-4A4F-9EE2-3DBFF90D91C7}
@@ -22,8 +22,8 @@ WizardStyle=modern
 SetupLogging=yes
 CloseApplications=no
 RestartApplications=no
-VersionInfoVersion=0.1.6.0
-VersionInfoDescription=Pure Gaussian Blur filter installer for Streamlabs Desktop with OBS Core 31.1.x
+VersionInfoVersion=0.1.7.0
+VersionInfoDescription=Pure Gaussian Blur filter installer for Streamlabs Desktop with OBS Core 31.1.2sl19b3
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
 
@@ -76,6 +76,45 @@ begin
   Result := ResultCode = 0;
 end;
 
+function IsBuildMarkerChar(Value: AnsiChar): Boolean;
+begin
+  Result := ((Value >= '0') and (Value <= '9')) or
+            ((Value >= 'A') and (Value <= 'Z')) or
+            ((Value >= 'a') and (Value <= 'z')) or
+            (Value = '.') or (Value = '-');
+end;
+
+function GetObsBuildMarker: String;
+var
+  Data: AnsiString;
+  StartIndex: Integer;
+  EndIndex: Integer;
+  Candidate: AnsiString;
+begin
+  Result := 'unknown';
+  if not LoadStringFromFile(GetRuntimeRoot + '\obs.dll', Data) then
+    Exit;
+
+  for StartIndex := 1 to Length(Data) - 6 do
+  begin
+    if Copy(Data, StartIndex, 7) = '31.1.2' then
+    begin
+      EndIndex := StartIndex + 7;
+      while (EndIndex <= Length(Data)) and
+            ((EndIndex - StartIndex) < 64) and
+            IsBuildMarkerChar(Data[EndIndex]) do
+        EndIndex := EndIndex + 1;
+      Candidate := Copy(Data, StartIndex, EndIndex - StartIndex);
+      if (Pos('31.1.2sl', Candidate) = 1) or
+         (Pos('31.1.2ndi', Candidate) = 1) then
+      begin
+        Result := String(Candidate);
+        Exit;
+      end;
+    end;
+  end;
+end;
+
 function InitializeSetup: Boolean;
 var
   StreamlabsVersion: String;
@@ -84,6 +123,7 @@ var
   ObsMinor: Word;
   ObsRevision: Word;
   ObsBuild: Word;
+  ObsBuildMarker: String;
 begin
   Result := False;
   StreamlabsRoot := ExpandConstant('{autopf}\Streamlabs OBS');
@@ -107,11 +147,15 @@ begin
       'Unable to read the OBS Core version.', mbError, MB_OK);
     Exit;
   end;
-  if (ObsMajor <> 31) or (ObsMinor <> 1) then
+  ObsBuildMarker := GetObsBuildMarker;
+  if (ObsMajor <> 31) or (ObsMinor <> 1) or
+     (CompareText(ObsBuildMarker, '31.1.2sl19b3') <> 0) then
   begin
-    MsgBox('此安裝器需要 OBS Core 31.1.x。偵測到 OBS：' + ObsVersion +
+    MsgBox('此安裝器需要已驗證的 OBS Core 31.1.2sl19b3。偵測到 OBS：' + ObsVersion +
+      '（' + ObsBuildMarker + '）' +
       '；Streamlabs Desktop：' + StreamlabsVersion + #13#10 +
-      'This installer requires OBS Core 31.1.x. Detected OBS: ' + ObsVersion +
+      'This installer requires verified OBS Core 31.1.2sl19b3. Detected OBS: ' + ObsVersion +
+      ' (' + ObsBuildMarker + ')' +
       '; Streamlabs Desktop: ' + StreamlabsVersion, mbError, MB_OK);
     Exit;
   end;

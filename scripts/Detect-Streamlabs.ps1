@@ -23,21 +23,23 @@ $exe = Join-Path $root 'Streamlabs OBS.exe'
 $supported = (Test-Path -LiteralPath $exe) -and (Test-Path -LiteralPath $obsDll) -and
     (Test-Path -LiteralPath $pluginRoot) -and (Test-Path -LiteralPath $dataRoot)
 $obsVersion = if (Test-Path -LiteralPath $obsDll) { (Get-Item -LiteralPath $obsDll).VersionInfo.FileVersion } else { $null }
+$obsBuildMarker = Get-ObsRuntimeBuildMarker -Path $obsDll
 $streamlabsVersion = $entry.DisplayVersion
-$versionSupported = Test-SupportedObsVersion -Version $obsVersion
+$versionSupported = Test-SupportedObsRuntime -Version $obsVersion -BuildMarker $obsBuildMarker
 
 [ordered]@{
     installed = [bool](Test-Path -LiteralPath $exe)
     installRoot = $root
     streamlabsVersion = $streamlabsVersion
     obsVersion = $obsVersion
+    obsBuildMarker = $obsBuildMarker
     architecture = 'x64'
     pluginRoot = $pluginRoot
     dataRoot = $dataRoot
     obsDll = $obsDll
     supported = [bool]($supported -and $versionSupported)
     reason = if (-not $supported) { 'Required Streamlabs OBS runtime paths were not found.' }
-             elseif (-not $versionSupported) { "This package requires OBS Core 31.1.x; detected $obsVersion in Streamlabs Desktop $streamlabsVersion." }
+             elseif (-not $versionSupported) { "This package requires verified OBS Core build 31.1.2sl19b3; detected $obsVersion ($obsBuildMarker) in Streamlabs Desktop $streamlabsVersion." }
              else { 'Compatible.' }
 } | ConvertTo-Json -Depth 4
 

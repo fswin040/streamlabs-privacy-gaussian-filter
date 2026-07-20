@@ -5,14 +5,14 @@
 An unofficial native Windows filter that applies privacy-grade Gaussian blur to an entire Streamlabs Desktop source or a percentage-based rectangular region. It is intended to obscure text, people, and other sensitive visual information.
 
 > [!IMPORTANT]
-> This community project is not affiliated with or endorsed by Streamlabs or the OBS Project. It supports Streamlabs Desktop builds whose embedded **OBS Core API is 31.1.x**. Streamlabs updates can remove the plugin or change internal behavior even when the core version remains compatible.
+> This community project is not affiliated with or endorsed by Streamlabs or the OBS Project. Version 0.1.7 is verified for Streamlabs Desktop 1.21.7 with embedded OBS build **31.1.2sl19b3**. The installer fails closed on other native ABI builds.
 
 ## Download and install
 
-1. Download `MotionFrostedGlass-Setup-0.1.6.exe` from [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases).
+1. Download `MotionFrostedGlass-Setup-0.1.7.exe` from [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases).
 2. Close Streamlabs Desktop completely.
 3. Run the installer as administrator.
-4. The installer checks the embedded `obs.dll` file version and continues only for OBS Core 31.1.x.
+4. The installer checks both the embedded `obs.dll` file version and exact build marker, and continues only for `31.1.2sl19b3`.
 5. Open a source's Filters window in Streamlabs and add **Pure Gaussian Blur**. Some Streamlabs interfaces may display **Shader** because of the compatibility source ID.
 
 The installer is unsigned, so Windows SmartScreen may show a warning. Verify the SHA-256 below before deciding whether to select **More info → Run anyway**.
@@ -33,19 +33,20 @@ This release focuses only on true Gaussian blur. It does not include animation, 
 
 The installer and plugin use two separate checks:
 
-- The installer reads the Windows file version of Streamlabs' embedded `obs.dll` and accepts major 31, minor 1, regardless of patch/build or Streamlabs Desktop application version.
-- The plugin checks the loaded OBS Core API again before registering the filter and refuses to load outside API 31.1.x.
+- The installer reads the Windows file version and scans the embedded runtime marker before copying files.
+- The plugin repeats the numeric API and exact `31.1.2sl19b3` marker check before registering the filter.
 
 Validated configuration:
 
 - Windows x64
-- Streamlabs Desktop 1.21.4
+- Streamlabs Desktop 1.21.7
 - Embedded `obs.dll` file version 31.1.2
 - Runtime OBS API 31.1.3
+- Runtime build marker `31.1.2sl19b3`
 
-This is a validated example, not an exact Streamlabs application-version requirement. OBS Core 31.0.x, 31.2.x, 32.x, missing DLLs, and unreadable versions are rejected.
+Compatibility is determined by the native runtime ABI marker, not only the Streamlabs application version. Unverified markers such as `31.1.2ndi1`, `31.1.2sl22`, missing DLLs, and unreadable versions are rejected.
 
-Streamlabs uses a fixed filter allowlist. This plugin uses the `shader_filter` compatibility source ID so it appears in the interface. Do not install it alongside another plugin using the same ID, including some OBS Shader Filter builds. Streamlabs updates may remove the plugin files; reinstall only when the updated build still embeds OBS Core 31.1.x.
+Streamlabs uses a fixed filter allowlist. This plugin uses the `shader_filter` compatibility source ID so it appears in the interface. Do not install it alongside another plugin using the same ID, including some OBS Shader Filter builds. Streamlabs updates may remove the plugin files; reinstall only when the installer confirms the exact verified runtime marker.
 
 ## Remove or recover
 
@@ -60,21 +61,21 @@ The installer does not replace `obs.dll`, the Streamlabs executable, or scene fi
 
 ## Verify the download
 
-`MotionFrostedGlass-Setup-0.1.6.exe`
+`MotionFrostedGlass-Setup-0.1.7.exe`
 
 ```text
-SHA-256 E41AEC29133C1550DC49AAD8D677B131A6EA685B3519B0432E8E1B3F8F0CA2D3
+SHA-256 0B8F1424D8CEFE11AAD3570FDCEF1AB63D868F75B9E68C67C7AD44C0525403B7
 ```
 
 PowerShell verification:
 
 ```powershell
-Get-FileHash .\MotionFrostedGlass-Setup-0.1.6.exe -Algorithm SHA256
+Get-FileHash .\MotionFrostedGlass-Setup-0.1.7.exe -Algorithm SHA256
 ```
 
 ## Build from source
 
-Building requires Visual Studio 2022, CMake, Windows SDK, Inno Setup 6, and a compatible Streamlabs OBS runtime. ABI headers correspond to the Streamlabs `obs-studio` fork tag `31.1.2ndi1`, commit `32985a8f9684035bfcfbea781046c88dba617024`.
+Building requires Visual Studio 2022, CMake, Windows SDK, Inno Setup 6, and a compatible Streamlabs OBS runtime. ABI headers correspond to Streamlabs fork build `31.1.2sl19b3`, commit `7fef2cce49a6e8c748e7c2da94ef3ee0dec69013`.
 
 This repository does not redistribute Streamlabs' `obs.dll` or other proprietary runtime binaries. `compat/libobs` contains only compatibility headers. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source and attribution details.
 
