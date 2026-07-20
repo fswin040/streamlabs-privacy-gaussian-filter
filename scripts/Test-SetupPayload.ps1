@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$package = Join-Path $root 'outputs\MotionFrostedGlass-0.1.7\plugin'
+$package = Join-Path $root 'outputs\MotionFrostedGlass-0.1.8\plugin'
 $installerSource = Join-Path $root 'installer\MotionFrostedGlass.iss'
 $expectedHash = 'A304D205570F2F148647B813B600B92F8B451D221EC705B64ABC65632153F106'
 
@@ -18,6 +18,19 @@ if ($installerText -notmatch "GetVersionComponents\(GetRuntimeRoot \+ '\\obs\.dl
 if ($installerText -notmatch "31\.1\.2sl19b3" -or
     $installerText -notmatch "CompareText\(ObsBuildMarker, '31\.1\.2sl19b3'\)") {
     throw 'Installer does not fail closed on the verified sl19b3 ABI marker'
+}
+if ($installerText -match "LoadStringFromFile\(GetRuntimeRoot \+ '\\obs\.dll'") {
+    throw 'Installer still reads binary obs.dll with LoadStringFromFile, which truncates the build marker'
+}
+foreach ($requiredExtractorText in @(
+    'WindowsPowerShell\v1.0\powershell.exe',
+    'ReadAllBytes',
+    '31\.1\.2(?:sl|ndi)',
+    'GetObsBuildMarker'
+)) {
+    if ($installerText -notmatch [regex]::Escape($requiredExtractorText)) {
+        throw "Installer is missing the binary-safe marker extractor token: $requiredExtractorText"
+    }
 }
 
 $required = @(

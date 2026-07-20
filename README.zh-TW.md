@@ -5,11 +5,11 @@
 這是一個非官方的 Windows 原生濾鏡，可對整個 Streamlabs Desktop 來源或以百分比指定的矩形區域套用隱私級高斯模糊，適合遮住文字、人物與其他敏感畫面資訊。
 
 > [!IMPORTANT]
-> 這是非官方社群專案，與 Streamlabs、OBS Project 無從屬或背書關係。0.1.7 已在 Streamlabs Desktop 1.21.7、內建 OBS build **31.1.2sl19b3** 驗證；遇到其他原生 ABI build 時安裝器會安全拒絕。
+> 這是非官方社群專案，與 Streamlabs、OBS Project 無從屬或背書關係。0.1.8 已在 Streamlabs Desktop 1.21.7、內建 OBS build **31.1.2sl19b3** 驗證；遇到其他原生 ABI build 時安裝器會安全拒絕。
 
 ## 下載與安裝
 
-1. 從 [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases) 下載 `MotionFrostedGlass-Setup-0.1.7.exe`。
+1. 從 [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases) 下載 `MotionFrostedGlass-Setup-0.1.8.exe`。
 2. 完全關閉 Streamlabs Desktop。
 3. 以系統管理員身分執行安裝程式。
 4. 安裝器會同時檢查內建 `obs.dll` 的檔案版本與 build marker，只有 `31.1.2sl19b3` 才會繼續。
@@ -61,16 +61,16 @@ Streamlabs 使用固定的濾鏡允許清單。本外掛使用 `shader_filter` �
 
 ## 驗證下載檔案
 
-`MotionFrostedGlass-Setup-0.1.7.exe`
+`MotionFrostedGlass-Setup-0.1.8.exe`
 
 ```text
-SHA-256 0B8F1424D8CEFE11AAD3570FDCEF1AB63D868F75B9E68C67C7AD44C0525403B7
+SHA-256 3BB6F49151289015D37C867EADCB928FC1EEFEF1CBC8FEB32D4630BBE6B7D2D7
 ```
 
 PowerShell 驗證方式：
 
 ```powershell
-Get-FileHash .\MotionFrostedGlass-Setup-0.1.7.exe -Algorithm SHA256
+Get-FileHash .\MotionFrostedGlass-Setup-0.1.8.exe -Algorithm SHA256
 ```
 
 ## 從原始碼建置

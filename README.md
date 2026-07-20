@@ -5,11 +5,11 @@
 An unofficial native Windows filter that applies privacy-grade Gaussian blur to an entire Streamlabs Desktop source or a percentage-based rectangular region. It is intended to obscure text, people, and other sensitive visual information.
 
 > [!IMPORTANT]
-> This community project is not affiliated with or endorsed by Streamlabs or the OBS Project. Version 0.1.7 is verified for Streamlabs Desktop 1.21.7 with embedded OBS build **31.1.2sl19b3**. The installer fails closed on other native ABI builds.
+> This community project is not affiliated with or endorsed by Streamlabs or the OBS Project. Version 0.1.8 is verified for Streamlabs Desktop 1.21.7 with embedded OBS build **31.1.2sl19b3**. The installer fails closed on other native ABI builds.
 
 ## Download and install
 
-1. Download `MotionFrostedGlass-Setup-0.1.7.exe` from [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases).
+1. Download `MotionFrostedGlass-Setup-0.1.8.exe` from [GitHub Releases](https://github.com/fswin040/streamlabs-privacy-gaussian-filter/releases).
 2. Close Streamlabs Desktop completely.
 3. Run the installer as administrator.
 4. The installer checks both the embedded `obs.dll` file version and exact build marker, and continues only for `31.1.2sl19b3`.
@@ -61,16 +61,16 @@ The installer does not replace `obs.dll`, the Streamlabs executable, or scene fi
 
 ## Verify the download
 
-`MotionFrostedGlass-Setup-0.1.7.exe`
+`MotionFrostedGlass-Setup-0.1.8.exe`
 
 ```text
-SHA-256 0B8F1424D8CEFE11AAD3570FDCEF1AB63D868F75B9E68C67C7AD44C0525403B7
+SHA-256 3BB6F49151289015D37C867EADCB928FC1EEFEF1CBC8FEB32D4630BBE6B7D2D7
 ```
 
 PowerShell verification:
 
 ```powershell
-Get-FileHash .\MotionFrostedGlass-Setup-0.1.7.exe -Algorithm SHA256
+Get-FileHash .\MotionFrostedGlass-Setup-0.1.8.exe -Algorithm SHA256
 ```
 
 ## Build from source

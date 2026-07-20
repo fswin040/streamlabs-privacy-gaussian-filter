@@ -49,7 +49,7 @@ Copy-Item -LiteralPath $sourceDll -Destination $targetDll -Force
 Get-ChildItem -LiteralPath $sourceData -Force | Copy-Item -Destination $targetData -Recurse -Force
 
 $manifest = [ordered]@{
-    pluginVersion = '0.1.7'
+    pluginVersion = '0.1.8'
     targetObsVersion = $detection.obsVersion
     targetObsBuildMarker = $detection.obsBuildMarker
     installedAt = (Get-Date).ToString('o')

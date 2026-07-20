@@ -1,6 +1,6 @@
 #define AppName "Pure Gaussian Blur for Streamlabs"
-#define AppVersion "0.1.7"
-#define Payload "..\outputs\MotionFrostedGlass-0.1.7\plugin"
+#define AppVersion "0.1.8"
+#define Payload "..\outputs\MotionFrostedGlass-0.1.8\plugin"
 
 [Setup]
 AppId={{A8BD55D5-878B-4A4F-9EE2-3DBFF90D91C7}
@@ -22,7 +22,7 @@ WizardStyle=modern
 SetupLogging=yes
 CloseApplications=no
 RestartApplications=no
-VersionInfoVersion=0.1.7.0
+VersionInfoVersion=0.1.8.0
 VersionInfoDescription=Pure Gaussian Blur filter installer for Streamlabs Desktop with OBS Core 31.1.2sl19b3
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
@@ -76,43 +76,41 @@ begin
   Result := ResultCode = 0;
 end;
 
-function IsBuildMarkerChar(Value: AnsiChar): Boolean;
+function QuotePowerShellLiteral(Value: String): String;
 begin
-  Result := ((Value >= '0') and (Value <= '9')) or
-            ((Value >= 'A') and (Value <= 'Z')) or
-            ((Value >= 'a') and (Value <= 'z')) or
-            (Value = '.') or (Value = '-');
+  Result := Value;
+  StringChangeEx(Result, '''', '''''', True);
+  Result := '''' + Result + '''';
 end;
 
 function GetObsBuildMarker: String;
 var
-  Data: AnsiString;
-  StartIndex: Integer;
-  EndIndex: Integer;
-  Candidate: AnsiString;
+  PowerShellPath: String;
+  OutputPath: String;
+  Command: String;
+  Params: String;
+  Marker: AnsiString;
+  ResultCode: Integer;
 begin
   Result := 'unknown';
-  if not LoadStringFromFile(GetRuntimeRoot + '\obs.dll', Data) then
-    Exit;
+  PowerShellPath := ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe');
+  OutputPath := ExpandConstant('{tmp}\motion-frosted-obs-marker.txt');
+  DeleteFile(OutputPath);
 
-  for StartIndex := 1 to Length(Data) - 6 do
-  begin
-    if Copy(Data, StartIndex, 7) = '31.1.2' then
-    begin
-      EndIndex := StartIndex + 7;
-      while (EndIndex <= Length(Data)) and
-            ((EndIndex - StartIndex) < 64) and
-            IsBuildMarkerChar(Data[EndIndex]) do
-        EndIndex := EndIndex + 1;
-      Candidate := Copy(Data, StartIndex, EndIndex - StartIndex);
-      if (Pos('31.1.2sl', Candidate) = 1) or
-         (Pos('31.1.2ndi', Candidate) = 1) then
-      begin
-        Result := String(Candidate);
-        Exit;
-      end;
-    end;
-  end;
+  Command := '$p=' + QuotePowerShellLiteral(GetRuntimeRoot + '\obs.dll') +
+    ';$o=' + QuotePowerShellLiteral(OutputPath) +
+    ';$t=[Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($p))' +
+    ';$m=[regex]::Match($t,''31\.1\.2(?:sl|ndi)[A-Za-z0-9.-]+'')' +
+    ';if($m.Success){[IO.File]::WriteAllText($o,$m.Value,[Text.Encoding]::ASCII)}';
+  Params := '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "' + Command + '"';
+
+  if not Exec(PowerShellPath, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    Exit;
+  if ResultCode <> 0 then
+    Exit;
+  if LoadStringFromFile(OutputPath, Marker) then
+    Result := Trim(String(Marker));
+  DeleteFile(OutputPath);
 end;
 
 function InitializeSetup: Boolean;

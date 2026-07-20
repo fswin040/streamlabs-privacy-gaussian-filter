@@ -29,7 +29,7 @@ foreach ($section in $chineseSections) {
 foreach ($document in @($english, $chinese)) {
     if ($document -notmatch '31\.1\.2sl19b3') { throw 'README does not state the exact verified ABI marker' }
     if ($document -notmatch 'Streamlabs Desktop 1\.21\.7') { throw 'README does not state the validated Streamlabs version' }
-    if ($document -notmatch 'MotionFrostedGlass-Setup-0\.1\.7\.exe') { throw 'README does not reference the v0.1.7 installer' }
+    if ($document -notmatch 'MotionFrostedGlass-Setup-0\.1\.8\.exe') { throw 'README does not reference the v0.1.8 installer' }
     if ($document -match 'supports Streamlabs Desktop builds whose embedded \*\*OBS Core API is 31\.1\.x|支援內建 \*\*OBS Core API 31\.1\.x') {
         throw 'README still makes a broad 31.1.x ABI compatibility claim'
     }
@@ -43,8 +43,8 @@ $englishHash = [regex]::Match($english, $hashPattern).Groups[1].Value
 $chineseHash = [regex]::Match($chinese, $hashPattern).Groups[1].Value
 if (-not $englishHash -or -not $chineseHash) { throw 'README checksum is missing' }
 if ($englishHash -ne $chineseHash) { throw 'English and Chinese README checksums differ' }
-if ($englishHash -ne '0B8F1424D8CEFE11AAD3570FDCEF1AB63D868F75B9E68C67C7AD44C0525403B7') {
-    throw 'README checksum does not match the v0.1.7 installer'
+if ($englishHash -ne '3BB6F49151289015D37C867EADCB928FC1EEFEF1CBC8FEB32D4630BBE6B7D2D7') {
+    throw 'README checksum does not match the v0.1.8 installer'
 }
 
 Write-Output "Documentation contract valid: $englishHash"
